@@ -1,18 +1,9 @@
 package baseball.model;
 
-public class GameResult {
-
-    private final int ballCount;
-    private final int strikeCount;
+public record GameResult(int ballCount, int strikeCount) {
 
     public GameResult() {
-        ballCount = 0;
-        strikeCount = 0;
-    }
-
-    public GameResult(int ballCount, int strikeCount) {
-        this.ballCount = ballCount;
-        this.strikeCount = strikeCount;
+        this(0,0);
     }
 
     public GameResult incrementBall() {
@@ -21,14 +12,6 @@ public class GameResult {
 
     public GameResult incrementStrike() {
         return new GameResult(ballCount, strikeCount + 1);
-    }
-
-    public int getBallCount() {
-        return ballCount;
-    }
-
-    public int getStrikeCount() {
-        return strikeCount;
     }
 
     public boolean isSuccess() {
