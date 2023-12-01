@@ -1,28 +1,53 @@
 package baseball.model;
 
-import baseball.utils.UserInputNumberValidator;
-import java.util.ArrayList;
-import java.util.Collections;
+import baseball.utils.ExceptionMessage;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class UserInputNumber {
+public record UserInputNumber(String userInputNumber) {
 
-    private final List<Integer> userNumber = new ArrayList<>();
+    private static final int NUMBER_SIZE = 3;
 
-    public UserInputNumber(String userNumber) {
-        UserInputNumberValidator.validate(userNumber);
-        convertInputStringToList(userNumber);
+    public UserInputNumber {
+        validate(userInputNumber);
     }
 
+    private void validate(final String userInputNumber) {
+        validateLength(userInputNumber);
+        validateDigit(userInputNumber);
+        validateDuplication(userInputNumber);
+    }
 
-    private void convertInputStringToList(String userInputNumber) {
-        for (char ch : userInputNumber.toCharArray()) {
-            userNumber.add(Character.getNumericValue(ch));
+    private void validateLength(final String userInputNumber) {
+        if (userInputNumber.length() != NUMBER_SIZE) {
+            throw new IllegalArgumentException(
+                ExceptionMessage.INVALID_NUMBER_SIZE_MESSAGE.getMessage());
         }
     }
 
-    public List<Integer> userNumberToList() {
-        return Collections.unmodifiableList(userNumber);
+    private void validateDigit(final String userInputNumber) {
+        if (!userInputNumber.chars()
+            .allMatch(ch -> Character.isDigit(ch) && ch >= '1' && ch <= '9')) {
+            throw new IllegalArgumentException(
+                ExceptionMessage.NON_DIGIT_ERROR_MESSAGE.getMessage()
+            );
+        }
     }
 
+    private void validateDuplication(final String userInputNumber) {
+        long uniqueCount = userInputNumber.chars()
+            .distinct()
+            .count();
+        if (uniqueCount != NUMBER_SIZE) {
+            throw new IllegalArgumentException(
+                ExceptionMessage.DUPLICATION_ERROR_MESSAGE.getMessage()
+            );
+        }
+    }
+
+    public List<Integer> convertToDigits() {
+        return userInputNumber().chars()
+            .mapToObj(ch -> Character.digit(ch, 10))
+            .collect(Collectors.toList());
+    }
 }
