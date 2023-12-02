@@ -1,8 +1,7 @@
 package baseball.controller;
 
-import baseball.model.AnswerNumber;
 import baseball.model.GameResult;
-import baseball.model.UserInputNumber;
+import baseball.service.GameState;
 import baseball.service.NumberMatcher;
 
 public class GameController {
@@ -10,41 +9,42 @@ public class GameController {
     private final InputController inputController;
     private final OutputController outputController;
     private final NumberMatcher numberMatcher;
+    private final GameState gameState;
 
     public GameController(final InputController inputController,
-        final OutputController outputController, final NumberMatcher numberMatcher) {
+        final OutputController outputController,
+        final NumberMatcher numberMatcher, final GameState gameState) {
         this.inputController = inputController;
         this.outputController = outputController;
         this.numberMatcher = numberMatcher;
+        this.gameState = gameState;
     }
 
     public void gameStart() {
         outputController.displayStartGame();
-        try {
-            do {
-                playRound();
-            } while (inputController.isContinued());
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
+        do {
+            playRound();
+            inputController.isContinued();
+        } while (gameState.isRunning());
     }
 
     private void playRound() {
-        AnswerNumber answerNumber = new AnswerNumber();
+        gameState.generateAnswerNumber();
         while (true) {
-            UserInputNumber userInputNumber = inputController.getUserInput();
+            inputController.getUserInput();
 
-            GameResult result = numberMatcher
-                .match(userInputNumber.convertToDigits(), answerNumber.answerNumberToList());
+            GameResult result = numberMatcher.match(
+                gameState.getCurrentUserInputNumber().convertToDigits(),
+                gameState.getAnswerNumber().answerNumberToList()
+            );
 
-            outputController.displayResult(result);
-
-            if (result.isSuccess()) {
-                outputController.displayStartGame();
+            gameState.setCurrentGameResult(result);
+            outputController.displayResult();
+            if(result.isSuccess()){
+                outputController.displayWinningMessage();
                 break;
             }
         }
     }
-
 
 }
