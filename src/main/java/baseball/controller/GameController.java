@@ -20,9 +20,13 @@ public class GameController {
 
     public void gameStart() {
         outputController.displayStartGame();
-        do {
-            playRound();
-        } while (inputController.isContinued());
+        try {
+            do {
+                playRound();
+            } while (inputController.isContinued());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void playRound() {
