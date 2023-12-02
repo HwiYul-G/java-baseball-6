@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 public record UserInputNumber(String userInputNumber) {
 
     private static final int NUMBER_SIZE = 3;
+    private static final char MIN_NUMBER = '1';
+    private static final char MAX_NUMBER = '9';
 
     public UserInputNumber {
         validate(userInputNumber);
@@ -27,7 +29,7 @@ public record UserInputNumber(String userInputNumber) {
 
     private void validateDigit(final String userInputNumber) {
         if (!userInputNumber.chars()
-            .allMatch(ch -> Character.isDigit(ch) && ch >= '1' && ch <= '9')) {
+            .allMatch(ch -> Character.isDigit(ch) && ch >= MIN_NUMBER && ch <= MAX_NUMBER)) {
             throw new IllegalArgumentException(
                 ExceptionMessage.NON_DIGIT_ERROR_MESSAGE.getMessage()
             );
