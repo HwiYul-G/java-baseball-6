@@ -18,11 +18,7 @@ public record RestartChoice(String choice) {
         }
     }
 
-    public boolean isQuit() {
-        return choice().equals(QUIT);
-    }
-
-    public boolean isRestart() {
+    public boolean isContinued() {
         return choice().equals(RESTART);
     }
 
