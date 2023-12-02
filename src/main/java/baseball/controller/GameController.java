@@ -4,53 +4,43 @@ import baseball.model.AnswerNumber;
 import baseball.model.GameResult;
 import baseball.model.UserInputNumber;
 import baseball.service.NumberMatcher;
-import baseball.view.InputView;
-import baseball.view.OutputView;
 
 public class GameController {
 
-    private static final int RESTART = 1;
-
+    private final InputController inputController;
+    private final OutputController outputController;
     private final NumberMatcher numberMatcher;
-    private final InputView inputView;
-    private final OutputView outputView;
 
-    public GameController(NumberMatcher numberMatcher, InputView inputView, OutputView outputView) {
+    public GameController(final InputController inputController,
+        final OutputController outputController, final NumberMatcher numberMatcher) {
+        this.inputController = inputController;
+        this.outputController = outputController;
         this.numberMatcher = numberMatcher;
-        this.inputView = inputView;
-        this.outputView = outputView;
     }
 
     public void gameStart() {
-        outputView.displayStartGame();
+        outputController.displayStartGame();
         do {
             playRound();
-        } while (isContinued());
+        } while (inputController.isContinued());
     }
 
     private void playRound() {
         AnswerNumber answerNumber = new AnswerNumber();
         while (true) {
-            String userInput = inputView.requestUserNumber();
-            UserInputNumber userInputNumber = new UserInputNumber(userInput);
+            UserInputNumber userInputNumber = inputController.getUserInput();
 
-            GameResult result = numberMatcher.match(userInputNumber.userNumberToList(),
-                answerNumber.answerNumberToList());
+            GameResult result = numberMatcher
+                .match(userInputNumber.convertToDigits(), answerNumber.answerNumberToList());
 
-            outputView.displayResult(result.getBallCount(), result.getStrikeCount());
+            outputController.displayResult(result);
 
             if (result.isSuccess()) {
-                outputView.displayWinningMessage();
+                outputController.displayStartGame();
                 break;
             }
-
         }
     }
 
-
-    private boolean isContinued() {
-        int choice = inputView.requestGameRestart();
-        return choice == RESTART;
-    }
 
 }
